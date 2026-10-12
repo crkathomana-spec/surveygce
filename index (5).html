@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GCE Designs Partnership & Launch Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F6FA; --card:#FFFFFF; --ink:#1B2140; --muted:#5A6180; --line:#D9DCE8;
+  --cobalt:#2F5BEA; --cobalt-soft:#E6ECFD; --marigold:#F2B705; --ok:#1E8A5A; --warn:#B4441E;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#12152A; --card:#1B1F38; --ink:#ECEEF7; --muted:#A3A9C6; --line:#2E3355;
+    --cobalt:#7C9BFF; --cobalt-soft:#262E5C; --marigold:#F5C842; --ok:#4CC28C; --warn:#F08A63;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12152A; --card:#1B1F38; --ink:#ECEEF7; --muted:#A3A9C6; --line:#2E3355;
+  --cobalt:#7C9BFF; --cobalt-soft:#262E5C; --marigold:#F5C842; --ok:#4CC28C; --warn:#F08A63;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.15;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px;border-radius:6px}
+.shell{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1180px;margin:0 auto;min-height:100vh}
+aside{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;height:100vh;padding:32px 20px 24px 28px;overflow:auto;border-right:1px solid var(--line)}
+.brand{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:15px;color:var(--muted);margin-bottom:22px}
+.brand b{display:block;color:var(--ink);font-size:20px}
+.nav{list-style:none;padding:0;margin:0;counter-reset:s}
+.nav li button{all:unset;cursor:pointer;display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:start;width:100%;padding:7px 8px;border-radius:8px;font-size:15px;line-height:1.35;color:var(--muted)}
+.nav li button:hover{background:var(--cobalt-soft)}
+.nav li button:focus-visible{outline:3px solid var(--cobalt)}
+.nav .num{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;border:1.5px solid var(--line)}
+.nav li.done .num{background:var(--ok);border-color:var(--ok);color:#fff}
+.nav li.current button{color:var(--ink);font-weight:700;background:var(--cobalt-soft)}
+.nav li.current .num{border-color:var(--cobalt);color:var(--cobalt)}
+.save-state{margin-top:22px;font-size:14px;color:var(--muted)}
+main{padding:40px 48px 120px;min-width:0}
+.topbar{display:none}
+.tabs{display:flex;gap:6px;margin-bottom:26px}
+.tabs button{border:1.5px solid var(--line);background:var(--card);padding:6px 14px;border-radius:999px;cursor:pointer;font-size:15px}
+.tabs button[aria-pressed="true"]{border-color:var(--cobalt);color:var(--cobalt);font-weight:700}
+.intro{max-width:720px}
+.intro h1{font-size:clamp(30px,4.5vw,46px);font-weight:700;letter-spacing:-.01em}
+.intro p{color:var(--muted);margin:14px 0 0}
+.scale-key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;color:var(--muted);margin-top:16px}
+.who{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px;max-width:720px}
+label.f{display:block;font-size:15px;font-weight:700}
+input[type=text],textarea{width:100%;margin-top:6px;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+textarea{min-height:110px;resize:vertical}
+input[type=text]:focus,textarea:focus{border-color:var(--cobalt);outline:none;box-shadow:0 0 0 3px var(--cobalt-soft)}
+.section-head{margin:40px 0 8px;max-width:760px}
+.section-head .of{font-size:15px;color:var(--muted)}
+.section-head h2{font-size:clamp(26px,3.4vw,34px);margin-top:4px}
+.sub{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:18px;color:var(--cobalt);margin:30px 0 4px}
+.q{max-width:760px;padding:22px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q .qt{display:grid;grid-template-columns:36px 1fr;gap:6px;font-weight:700;margin-bottom:12px}
+.q .qn{color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums}
+.q .body{margin-left:42px}
+.hint{font-size:14px;color:var(--muted);margin:-6px 0 10px}
+.rating{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:64px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;line-height:1.2;text-align:center}
+.chip span b{font-family:"Bricolage Grotesque",sans-serif;font-size:20px}
+.chip span small{font-size:12px;color:var(--muted)}
+.chip input:checked + span{border-color:var(--cobalt);background:var(--cobalt);color:#fff}
+.chip input:checked + span small{color:#fff}
+.chip input:focus-visible + span{outline:3px solid var(--cobalt);outline-offset:2px}
+.chip.na span{min-width:auto;padding:8px 14px;font-size:14px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts.row{flex-direction:row;flex-wrap:wrap}
+.opts .chip span{flex-direction:row;min-width:auto;padding:8px 16px}
+.grid-wrap{overflow-x:auto;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+table.grid{border-collapse:collapse;width:100%;min-width:520px;font-size:15px}
+table.grid th,table.grid td{padding:9px 12px;text-align:center;border-bottom:1px solid var(--line)}
+table.grid th:first-child,table.grid td:first-child{text-align:left}
+table.grid thead th{font-weight:700;color:var(--muted);font-size:13px;line-height:1.25}
+table.grid tbody tr:last-child td{border-bottom:0}
+table.grid input{width:20px;height:20px;accent-color:var(--cobalt);cursor:pointer}
+.follow{margin-top:14px}
+.pager{display:flex;justify-content:space-between;gap:12px;max-width:760px;margin-top:34px}
+.btn{border:0;border-radius:10px;padding:12px 22px;font-weight:700;cursor:pointer;background:var(--cobalt);color:#fff;font-size:16px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.banner{max-width:760px;padding:12px 16px;border-radius:10px;border:1.5px solid var(--warn);color:var(--warn);margin-bottom:20px;font-size:15px}
+.done-card{max-width:640px;margin-top:60px}
+.done-card h2{font-size:36px}
+.done-card p{color:var(--muted)}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;background:var(--marigold);width:0;transition:width .3s}
+[hidden]{display:none!important}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  aside{display:none}
+  main{padding:20px 18px 100px}
+  .topbar{display:block;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:10px 0 12px;margin:-20px 0 8px;border-bottom:1px solid var(--line)}
+  .topbar .t{font-size:14px;color:var(--muted);display:flex;justify-content:space-between}
+  .who{grid-template-columns:1fr}
+  .q .qt{grid-template-columns:30px 1fr}
+  .q .body{margin-left:0}
+  .chip span{min-width:52px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside aria-label="Survey sections">
+    <div class="brand">Spectrum Designs<b>GCE Partnership Assessment</b></div>
+    <ol class="nav" id="nav"></ol>
+    <div class="save-state" id="saveState" aria-live="polite"></div>
+  </aside>
+  <main>
+    <div class="topbar"><div class="t"><span id="topSection"></span><span id="topSave"></span></div><div class="prog"><i id="topProg"></i></div></div>
+    <div id="banner" class="banner" hidden></div>
+    <div id="surveyView">
+      <div id="welcome" class="intro">
+        <h1>GCE Designs Partnership &amp; Launch Assessment</h1>
+        <p>Spectrum Designs wants to learn from launching and supporting GCE Designs: what worked, what was hard, what we should do differently, and what support would help from here. Your answers will shape how we support the next organization through a launch like this.</p>
+        <p>Your answers are saved in this browser as you go, so you can stop and come back on the same device. Skip anything that doesn't apply to you.</p>
+        <div class="scale-key"><span>1 Very poor</span><span>2 Poor</span><span>3 Fair</span><span>4 Good</span><span>5 Excellent</span><span>N/A Didn't interact with this area</span></div>
+        <div class="who">
+          <label class="f">Your name<input type="text" id="rName" autocomplete="name"></label>
+          <label class="f">Your role at GCE<input type="text" id="rRole"></label>
+        </div>
+      </div>
+      <form id="form" onsubmit="return false"></form>
+      <div class="pager">
+        <button type="button" class="btn ghost" id="prev">Back</button>
+        <button type="button" class="btn" id="next">Next section</button>
+      </div>
+    </div>
+    <div id="doneView" class="done-card" hidden>
+      <h2>Thank you, your survey is submitted.</h2>
+      <p>Spectrum Designs will review every response before planning the next partnership.</p>
+      <p id="doneNote"></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn" id="dlCopy">Download a copy of my answers</button><button type="button" class="btn ghost" id="reopen">Edit my answers</button></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const AREAS31=["Production","Equipment operation","Production software","Pricing","Sales","Marketing","Quality control","Hiring and onboarding","Managing neurodiverse employees"];
+const AREAS44=["Production","Equipment","Quality control","Marketing","Sales / lead generation","Pricing","Staffing","Neurodiverse employment practices","Employee training","Management training","Finance","Technology / systems","Strategic planning"];
+const R=(n,text,na)=>({n,type:"rating",text,na:na===undefined?false:na});
+const O=(n,text,hint)=>({n,type:"open",text,hint});
+const C=(n,text,options,row)=>({n,type:"choice",text,options,row});
+const SECTIONS=[
+ {title:"Before the launch",groups:[["Understanding and expectations",[
+  R(1,"Before the project began, how clearly did you understand what Spectrum Designs would provide to GCE?"),
+  R(2,"How clearly were GCE's responsibilities explained before the project began?"),
+  R(3,"How well did Spectrum help your team understand what would be required to operate an apparel and promotional-products business?"),
+  O(4,"Looking back, what do you wish you had known before beginning the process?"),
+  O(5,"Were there any expectations about the partnership that turned out differently from what you originally understood?")]]]},
+ {title:"Planning and preparation",groups:[
+  ["Suppliers",[R(6,"How helpful were Spectrum's introductions to trusted apparel-industry suppliers?","N/A"),
+   {...C(7,"Were there suppliers you needed that Spectrum did not adequately help you identify?",["Yes","No"],true),follow:{when:"Yes",text:"What suppliers or resources were missing?"}}]],
+  ["Machinery and equipment",[R(8,"How helpful were Spectrum's recommendations regarding machinery and equipment?","N/A"),
+   R(9,"Did the machinery and equipment recommendations adequately meet your operational needs once you began production?","N/A"),
+   O(10,"Knowing what you know today, what equipment recommendations would you change?")]],
+  ["Production software and systems",[R(11,"How helpful was Spectrum in recommending and implementing production software and systems?","N/A"),
+   O(12,"Which systems or tools were easiest to adopt? Why?"),
+   O(13,"Which systems or tools were difficult, confusing, or created unnecessary work? Why?")]]]},
+ {title:"Training and knowledge transfer",groups:[
+  ["",[R(14,"Overall, how effective was Spectrum at teaching your team how to operate an apparel-production business?"),
+   R(15,"How useful was the opportunity for GCE staff to learn directly from Spectrum's production team?","N/A")]],
+  ["Training materials and SOPs",[R(16,"How useful were Spectrum's written SOPs, videos, training materials, and other resources?"),
+   R(17,"How easy was it to find the information you needed when you needed it?"),
+   R(18,"How easy was Trainual to use as the location for Spectrum's SOPs and training information?","Did not use Trainual"),
+   O(19,"What problems, if any, did you experience using Trainual or accessing Spectrum's training resources?"),
+   O(20,"If Spectrum were launching another location tomorrow, how should training materials be delivered differently?")]]]},
+ {title:"Marketing, sales and pricing",groups:[["",[
+  R(21,"How useful was Spectrum's guidance on pricing?","N/A"),
+  R(22,"How useful was Spectrum's guidance on marketing?","N/A"),
+  R(23,"How useful was Spectrum's guidance on lead generation and business development?","N/A"),
+  R(24,"How useful were Spectrum's branding and marketing materials?","N/A"),
+  O(25,"What additional sales or marketing support would have helped GCE become successful faster?")]]]},
+ {title:"Facility and operational setup",groups:[["",[
+  R(26,"How useful was Spectrum's guidance regarding the setup and layout of the GCE Designs facility?","N/A"),
+  O(27,"Were there any facility, workflow, production or operational problems that Spectrum could have helped GCE anticipate earlier?"),
+  O(28,"What part of setting up the operation was more difficult than you expected?"),
+  O(29,"What part of the setup process did Spectrum handle particularly well?")]]]},
+ {title:"Launch and implementation",groups:[["",[
+  R(30,"How prepared did you feel when GCE Designs began operating?"),
+  {n:31,type:"grid",text:"At the time of launch, did your team feel capable of handling the following independently?",rows:AREAS31,cols:["Yes","Somewhat","No","N/A"]},
+  O(32,"Where did you feel least prepared when operations started?"),
+  O(33,"During the actual launch, what support from Spectrum was most valuable?"),
+  O(34,"During the actual launch, where did you need more support from Spectrum?")]]]},
+ {title:"Neurodiverse employment model",groups:[["",[
+  R(35,"How useful was Spectrum's guidance on recruiting neurodiverse employees?","N/A"),
+  R(36,"How useful was Spectrum's guidance on onboarding and retaining neurodiverse employees?","N/A"),
+  R(37,"How effective was Spectrum's training on working alongside and managing neurodiverse employees?","N/A"),
+  R(38,"How helpful was Spectrum's guidance on implementing its natural support model?","N/A"),
+  O(39,"What additional training or resources would help GCE strengthen its inclusive employment model?")]]]},
+ {title:"Spectrum's ongoing support",groups:[
+  ["",[R(40,"How satisfied are you with Spectrum's support since GCE Designs became operational?"),
+   R(41,"When you need help, how easy is it to get the right person at Spectrum involved?"),
+   R(42,"How responsive is Spectrum when GCE asks for assistance?"),
+   R(43,"How useful is the technical and operational support currently provided by Spectrum?")]],
+  ["Where should Spectrum provide more support?",[
+   {n:44,type:"grid",text:"Please rate how much additional support would be valuable in each area.",rows:AREAS44,cols:["No additional support","Some more support","Much more support"]},
+   O(45,"What is the one area where Spectrum could provide the most additional value to GCE right now?")]]]},
+ {title:"Communication and relationship",groups:[["",[
+  R(46,"How effective has communication between GCE and Spectrum been?"),
+  R(47,"Are roles and responsibilities between Spectrum and GCE currently clear?"),
+  C(48,"Do you know who at Spectrum to contact for different types of questions or problems?",["Yes","Mostly","No"],true),
+  C(49,"How often would structured meetings between GCE and Spectrum be most useful?",["Monthly","Every two months","Quarterly","Twice per year","Annually","Only when needed"]),
+  O(50,"What could Spectrum do to make communication and collaboration easier?")]]]},
+ {title:"Value of the partnership",groups:[["",[
+  {...R(51,"How much value does Spectrum's ongoing involvement currently provide to GCE Designs?"),labels:["Very little value","","","","Significant value"]},
+  O(52,"Which parts of Spectrum's ongoing support provide the greatest value to GCE?"),
+  O(53,"Which parts of Spectrum's ongoing support currently provide the least value?"),
+  {...C(54,"Are there services or resources included in the partnership that GCE is currently not using?",["Yes","No","Unsure"],true),follow:{when:"Yes",text:"Which ones, and why are they not being used?"}},
+  O(55,"What additional services or resources would make the partnership more valuable to GCE?")]]]},
+ {title:"If we did this again",groups:[["",[
+  O(56,"If Spectrum helped another organization launch a similar operation, what should Spectrum definitely do again?"),
+  O(57,"What should Spectrum not do again?"),
+  O(58,"What should Spectrum do differently next time?"),
+  O(59,"What part of the launch process should receive significantly more time or attention?"),
+  O(60,"What could Spectrum standardize or create in advance to make the next launch easier?","For example: training, checklists, implementation plans, SOPs, templates, technology, equipment lists, vendor lists or dedicated support."),
+  O(61,"Based on your experience, what advice would you give another nonprofit considering launching a Spectrum Designs-based operation?")]]]},
+ {title:"Overall assessment",groups:[["",[
+  R(62,"Overall, how would you rate the process of launching GCE Designs with Spectrum?"),
+  R(63,"Overall, how would you rate Spectrum as an ongoing partner?"),
+  R(64,"How confident are you that GCE Designs can currently operate successfully with the systems, knowledge and resources it has received?"),
+  C(65,"Would you recommend this partnership model to another nonprofit organization?",["Definitely yes","Probably yes","Unsure","Probably not","Definitely not"]),
+  O(66,"Why did you choose that answer?"),
+  O(67,"Is there anything we have not asked that Spectrum needs to know before attempting another partnership like GCE Designs?")]]]}
+];
+const SCALE=["Very poor","Poor","Fair","Good","Excellent"];
+const ALLQ=SECTIONS.flatMap(s=>s.groups.flatMap(g=>g[1]));
+
+let answers={}, current=0, status="draft";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function qHTML(q){
+  const k="q"+q.n, v=answers[k];
+  let body="";
+  if(q.type==="rating"){
+    const labels=q.labels||SCALE;
+    body='<div class="rating" role="radiogroup" aria-labelledby="t'+k+'">'+[1,2,3,4,5].map(i=>
+      `<label class="chip"><input type="radio" name="${k}" value="${i}" ${v==i?"checked":""}><span><b>${i}</b>${labels[i-1]?`<small>${labels[i-1]}</small>`:""}</span></label>`).join("")+
+      (q.na?`<label class="chip na"><input type="radio" name="${k}" value="N/A" ${v==="N/A"?"checked":""}><span>${esc(q.na)}</span></label>`:"")+'</div>';
+  }else if(q.type==="open"){
+    body=(q.hint?`<p class="hint">${esc(q.hint)}</p>`:"")+`<textarea name="${k}" aria-labelledby="t${k}">${esc(v)}</textarea>`;
+  }else if(q.type==="choice"){
+    body=`<div class="opts ${q.row?"row":""}" role="radiogroup" aria-labelledby="t${k}">`+q.options.map(o=>
+      `<label class="chip"><input type="radio" name="${k}" value="${esc(o)}" ${v===o?"checked":""}><span>${esc(o)}</span></label>`).join("")+'</div>';
+    if(q.follow){
+      const fk=k+"_followup";
+      body+=`<div class="follow" data-follow="${k}" ${v===q.follow.when?"":"hidden"}><label class="f">${esc(q.follow.text)}<textarea name="${fk}">${esc(answers[fk])}</textarea></label></div>`;
+    }
+  }else if(q.type==="grid"){
+    const g=v||{};
+    body='<div class="grid-wrap"><table class="grid"><thead><tr><th scope="col">Area</th>'+q.cols.map(c=>`<th scope="col">${esc(c)}</th>`).join("")+'</tr></thead><tbody>'+
+      q.rows.map((r,ri)=>'<tr><th scope="row" style="font-weight:400">'+esc(r)+'</th>'+q.cols.map(c=>
+        `<td><input type="radio" name="${k}__${ri}" value="${esc(c)}" aria-label="${esc(r)}: ${esc(c)}" ${g[r]===c?"checked":""}></td>`).join("")+'</tr>').join("")+'</tbody></table></div>';
+  }
+  return `<div class="q"><div class="qt" id="t${k}"><span class="qn">${q.n}.</span><span>${esc(q.text)}</span></div><div class="body">${body}</div></div>`;
+}
+
+function render(){
+  const s=SECTIONS[current];
+  let h=`<div class="section-head"><div class="of">Section ${current+1} of ${SECTIONS.length}</div><h2>${esc(s.title)}</h2></div>`;
+  for(const [sub,qs] of s.groups){ if(sub) h+=`<div class="sub">${esc(sub)}</div>`; h+=qs.map(qHTML).join(""); }
+  $("form").innerHTML=h;
+  $("welcome").hidden=current!==0;
+  $("prev").disabled=current===0;
+  $("next").textContent=current===SECTIONS.length-1?"Submit survey":"Next section";
+  $("topSection").textContent=`Section ${current+1} of ${SECTIONS.length}: ${s.title}`;
+  renderNav();
+}
+function sectionDone(i){
+  return SECTIONS[i].groups.flatMap(g=>g[1]).every(q=>{const v=answers["q"+q.n];return q.type==="grid"?v&&Object.keys(v).length===q.rows.length:v!==undefined&&v!=="";});
+}
+function renderNav(){
+  $("nav").innerHTML=SECTIONS.map((s,i)=>`<li class="${i===current?"current":""} ${sectionDone(i)?"done":""}"><button type="button" data-i="${i}" ${i===current?'aria-current="step"':""}><span class="num">${sectionDone(i)?"✓":i+1}</span><span>${esc(s.title)}</span></button></li>`).join("");
+  const answered=ALLQ.filter(q=>{const v=answers["q"+q.n];return v!==undefined&&v!==""&&!(typeof v==="object"&&!Object.keys(v).length)}).length;
+  $("topProg").style.width=(answered/ALLQ.length*100)+"%";
+}
+$("nav").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b){current=+b.dataset.i;render();saveLocal();window.scrollTo(0,0);}});
+$("prev").onclick=()=>{if(current>0){current--;render();window.scrollTo(0,0);}};
+$("next").onclick=async()=>{
+  if(current<SECTIONS.length-1){current++;render();window.scrollTo(0,0);return;}
+  if(!(await submit())) return;
+  status="submitted"; saveLocal(); showDone();
+};
+$("reopen").onclick=()=>{status="draft";$("doneView").hidden=true;$("surveyView").hidden=false;current=0;render();saveLocal();};
+function showDone(){$("surveyView").hidden=true;$("doneView").hidden=false;window.scrollTo(0,0);}
+
+$("form").addEventListener("input",e=>{
+  const t=e.target, name=t.name; if(!name) return;
+  if(name.includes("__")){
+    const [k,ri]=name.split("__"); const q=ALLQ.find(x=>"q"+x.n===k);
+    answers[k]={...(answers[k]||{}),[q.rows[+ri]]:t.value};
+  }else{
+    answers[name]=t.value;
+    const f=document.querySelector(`[data-follow="${name}"]`);
+    if(f){const q=ALLQ.find(x=>"q"+x.n===name);f.hidden=t.value!==q.follow.when;}
+  }
+  renderNav(); queueSave();
+});
+["rName","rRole"].forEach(id=>$(id).addEventListener("input",queueSave));
+
+/* ---- settings ----
+   To collect responses, paste a form endpoint here (for example a Formspree URL like
+   "https://formspree.io/f/abcdwxyz"). Leave it empty and respondents will download
+   their answers as a CSV file to email back instead. */
+const SUBMIT_URL = "";
+const STORE_KEY = "gce-partnership-survey-v1";
+
+/* ---- saving (this browser only) ---- */
+let timer=null;
+function setSave(msg){$("saveState").textContent=msg;$("topSave").textContent=msg;}
+function queueSave(){setSave("Unsaved changes");clearTimeout(timer);timer=setTimeout(saveLocal,600);}
+function saveLocal(){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify({answers,name:$("rName").value,role:$("rRole").value,status,current}));setSave("Saved in this browser");}
+  catch(e){setSave("");}
+}
+function showBanner(m){$("banner").textContent=m;$("banner").hidden=false;}
+
+/* ---- flatten answers into labeled columns ---- */
+function flat(){
+  const out={"Name":$("rName").value.trim(),"Role":$("rRole").value.trim(),"Submitted":new Date().toISOString()};
+  for(const q of ALLQ){
+    const v=answers["q"+q.n];
+    if(q.type==="grid"){q.rows.forEach(r=>out[`Q${q.n} ${r}`]=(v&&v[r])||"");}
+    else{out[`Q${q.n} ${q.text}`]=v??"";
+      if(q.follow) out[`Q${q.n} follow-up: ${q.follow.text}`]=answers["q"+q.n+"_followup"]||"";}
+  }
+  return out;
+}
+function downloadCSV(){
+  const f=flat(), cell=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const csv="\ufeff"+Object.keys(f).map(cell).join(",")+"\r\n"+Object.values(f).map(cell).join(",")+"\r\n";
+  const who=(f.Name||"response").replace(/[^a-z0-9]+/gi,"-").toLowerCase();
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download=`gce-survey-${who}.csv`; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+async function submit(){
+  if(!SUBMIT_URL){
+    downloadCSV();
+    $("doneNote").textContent="Your answers were downloaded as a CSV file. Please email that file to your Spectrum Designs contact.";
+    return true;
+  }
+  const btn=$("next"); btn.disabled=true; btn.textContent="Submitting…";
+  try{
+    const fd=new FormData(); for(const [k,v] of Object.entries(flat())) fd.append(k,v);
+    const r=await fetch(SUBMIT_URL,{method:"POST",body:fd,headers:{Accept:"application/json"}});
+    if(!r.ok) throw new Error(r.status);
+    $("doneNote").textContent="Your answers were sent to Spectrum Designs.";
+    return true;
+  }catch(e){
+    showBanner("Your answers didn't send. Check your connection and try again, or use the download button after submitting to email them instead.");
+    return false;
+  }finally{btn.disabled=false;btn.textContent="Submit survey";}
+}
+$("dlCopy").onclick=downloadCSV;
+
+/* ---- boot ---- */
+try{
+  const d=JSON.parse(localStorage.getItem(STORE_KEY)||"null");
+  if(d){answers=d.answers||{};$("rName").value=d.name||"";$("rRole").value=d.role||"";status=d.status||"draft";current=Math.min(d.current||0,SECTIONS.length-1);}
+}catch(e){}
+render(); setSave(Object.keys(answers).length?"Saved in this browser":"");
+if(status==="submitted"){$("doneNote").textContent="You've already submitted this survey from this browser.";showDone();}
+</script>
+</body>
+</html>
