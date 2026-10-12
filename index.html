@@ -86,6 +86,7 @@ table.grid th,table.grid td{padding:9px 12px;text-align:center;border-bottom:1px
 table.grid th:first-child,table.grid td:first-child{text-align:left}
 table.grid thead th{font-weight:700;color:var(--muted);font-size:13px;line-height:1.25}
 table.grid tbody tr:last-child td{border-bottom:0}
+table.grid tbody th small{display:block;color:var(--muted);font-size:13px;line-height:1.3}
 table.grid input{width:20px;height:20px;accent-color:var(--cobalt);cursor:pointer}
 .follow{margin-top:14px}
 .pager{display:flex;justify-content:space-between;gap:12px;max-width:760px;margin-top:34px}
@@ -152,6 +153,17 @@ table.grid input{width:20px;height:20px;accent-color:var(--cobalt);cursor:pointe
 <script>
 const AREAS31=["Production","Equipment operation","Production software","Pricing","Sales","Marketing","Quality control","Hiring and onboarding","Managing neurodiverse employees"];
 const AREAS44=["Production","Equipment","Quality control","Marketing","Sales / lead generation","Pricing","Staffing","Neurodiverse employment practices","Employee training","Management training","Finance","Technology / systems","Strategic planning"];
+/* Q22 digital marketing areas: [label, short description shown under it] */
+const DIGITAL22=[
+  ["Search engine optimization (SEO)","Getting found on Google, keywords, website rankings"],
+  ["Google Business Profile and local listings","Maps listing, reviews, local directories"],
+  ["Social media","Instagram, Facebook, LinkedIn, TikTok posting and engagement"],
+  ["Paid advertising","Google Ads, Meta / social ads, retargeting"],
+  ["Email marketing","Newsletters, customer lists, follow-up campaigns"],
+  ["Website and online store","Site content, landing pages, online ordering"],
+  ["Content creation","Photos, videos, blog posts, customer stories"],
+  ["Analytics and reporting","Tracking results, knowing what's working"]
+];
 const R=(n,text,na)=>({n,type:"rating",text,na:na===undefined?false:na});
 const O=(n,text,hint)=>({n,type:"open",text,hint});
 const C=(n,text,options,row)=>({n,type:"choice",text,options,row});
@@ -179,12 +191,13 @@ const SECTIONS=[
    R(18,"How easy was Trainual to use as the location for Spectrum's SOPs and training information?","Did not use Trainual"),
    O(19,"What problems, if any, did you experience using Trainual or accessing Spectrum's training resources?"),
    O(20,"If Spectrum were launching another location tomorrow, how should training materials be delivered differently?")]]]},
- {title:"Marketing, sales and pricing",groups:[["",[
-  R(21,"How useful was Spectrum's guidance on pricing?","N/A"),
-  R(22,"How useful was Spectrum's guidance on marketing?","N/A"),
-  R(23,"How useful was Spectrum's guidance on lead generation and business development?","N/A"),
-  R(24,"How useful were Spectrum's branding and marketing materials?","N/A"),
-  O(25,"What additional sales or marketing support would have helped GCE become successful faster?")]]]},
+ {title:"Marketing, sales and pricing",groups:[
+  ["",[R(21,"How useful was Spectrum's guidance on pricing?","N/A")]],
+  ["Digital marketing",[
+   {n:22,type:"grid",text:"How useful was Spectrum's guidance in each area of digital marketing?",hint:"Choose \"Didn't receive guidance\" for any area Spectrum didn't cover with you.",rows:DIGITAL22,cols:["Very useful","Useful","Somewhat useful","Not useful","Didn't receive guidance"]}]],
+  ["",[R(23,"How useful was Spectrum's guidance on lead generation and business development?","N/A"),
+   R(24,"How useful were Spectrum's branding and marketing materials?","N/A"),
+   O(25,"What additional sales or marketing support would have helped GCE become successful faster?")]]]},
  {title:"Facility and operational setup",groups:[["",[
   R(26,"How useful was Spectrum's guidance regarding the setup and layout of the GCE Designs facility?","N/A"),
   O(27,"Were there any facility, workflow, production or operational problems that Spectrum could have helped GCE anticipate earlier?"),
@@ -218,8 +231,8 @@ const SECTIONS=[
   O(50,"What could Spectrum do to make communication and collaboration easier?")]]]},
  {title:"Value of the partnership",groups:[["",[
   {...R(51,"How much value does Spectrum's ongoing involvement currently provide to GCE Designs?"),labels:["Very little value","","","","Significant value"]},
-  O(52,"Which parts of Spectrum's ongoing support provide the greatest value to GCE?"),
-  O(53,"Which parts of Spectrum's ongoing support currently provide the least value?"),
+  O(52,"Which parts of Spectrum's ongoing involvement provide the greatest value to GCE?"),
+  O(53,"Which parts of Spectrum's ongoing involvement currently provide the least value?"),
   {...C(54,"Are there services or resources included in the partnership that GCE is currently not using?",["Yes","No","Unsure"],true),follow:{when:"Yes",text:"Which ones, and why are they not being used?"}},
   O(55,"What additional services or resources would make the partnership more valuable to GCE?")]]]},
  {title:"If we did this again",groups:[["",[
@@ -239,6 +252,9 @@ const SECTIONS=[
 ];
 const SCALE=["Very poor","Poor","Fair","Good","Excellent"];
 const ALLQ=SECTIONS.flatMap(s=>s.groups.flatMap(g=>g[1]));
+/* grid rows may be plain strings or [label, description] pairs */
+const rowLabel=r=>Array.isArray(r)?r[0]:r;
+const rowDesc=r=>Array.isArray(r)?r[1]:"";
 
 let answers={}, current=0, status="draft";
 const $=id=>document.getElementById(id);
@@ -262,10 +278,10 @@ function qHTML(q){
       body+=`<div class="follow" data-follow="${k}" ${v===q.follow.when?"":"hidden"}><label class="f">${esc(q.follow.text)}<textarea name="${fk}">${esc(answers[fk])}</textarea></label></div>`;
     }
   }else if(q.type==="grid"){
-    const g=v||{};
-    body='<div class="grid-wrap"><table class="grid"><thead><tr><th scope="col">Area</th>'+q.cols.map(c=>`<th scope="col">${esc(c)}</th>`).join("")+'</tr></thead><tbody>'+
-      q.rows.map((r,ri)=>'<tr><th scope="row" style="font-weight:400">'+esc(r)+'</th>'+q.cols.map(c=>
-        `<td><input type="radio" name="${k}__${ri}" value="${esc(c)}" aria-label="${esc(r)}: ${esc(c)}" ${g[r]===c?"checked":""}></td>`).join("")+'</tr>').join("")+'</tbody></table></div>';
+    const g=(v&&typeof v==="object")?v:{};
+    body=(q.hint?`<p class="hint">${esc(q.hint)}</p>`:"")+'<div class="grid-wrap"><table class="grid"><thead><tr><th scope="col">Area</th>'+q.cols.map(c=>`<th scope="col">${esc(c)}</th>`).join("")+'</tr></thead><tbody>'+
+      q.rows.map((r,ri)=>{const L=rowLabel(r),D=rowDesc(r);return '<tr><th scope="row" style="font-weight:400">'+esc(L)+(D?`<small>${esc(D)}</small>`:"")+'</th>'+q.cols.map(c=>
+        `<td><input type="radio" name="${k}__${ri}" value="${esc(c)}" aria-label="${esc(L)}: ${esc(c)}" ${g[L]===c?"checked":""}></td>`).join("")+'</tr>';}).join("")+'</tbody></table></div>';
   }
   return `<div class="q"><div class="qt" id="t${k}"><span class="qn">${q.n}.</span><span>${esc(q.text)}</span></div><div class="body">${body}</div></div>`;
 }
@@ -303,7 +319,8 @@ $("form").addEventListener("input",e=>{
   const t=e.target, name=t.name; if(!name) return;
   if(name.includes("__")){
     const [k,ri]=name.split("__"); const q=ALLQ.find(x=>"q"+x.n===k);
-    answers[k]={...(answers[k]||{}),[q.rows[+ri]]:t.value};
+    const prev=(answers[k]&&typeof answers[k]==="object")?answers[k]:{};
+    answers[k]={...prev,[rowLabel(q.rows[+ri])]:t.value};
   }else{
     answers[name]=t.value;
     const f=document.querySelector(`[data-follow="${name}"]`);
@@ -335,7 +352,7 @@ function flat(){
   const out={"Name":$("rName").value.trim(),"Role":$("rRole").value.trim(),"Submitted":new Date().toISOString()};
   for(const q of ALLQ){
     const v=answers["q"+q.n];
-    if(q.type==="grid"){q.rows.forEach(r=>out[`Q${q.n} ${r}`]=(v&&v[r])||"");}
+    if(q.type==="grid"){q.rows.forEach(r=>{const L=rowLabel(r);out[`Q${q.n} ${L}`]=(v&&v[L])||"";});}
     else{out[`Q${q.n} ${q.text}`]=v??"";
       if(q.follow) out[`Q${q.n} follow-up: ${q.follow.text}`]=answers["q"+q.n+"_followup"]||"";}
   }
@@ -374,6 +391,8 @@ $("dlCopy").onclick=downloadCSV;
 try{
   const d=JSON.parse(localStorage.getItem(STORE_KEY)||"null");
   if(d){answers=d.answers||{};$("rName").value=d.name||"";$("rRole").value=d.role||"";status=d.status||"draft";current=Math.min(d.current||0,SECTIONS.length-1);}
+  /* drafts saved before Q22 became a grid stored a single number; drop it so the new grid starts clean */
+  if(answers.q22!==undefined&&typeof answers.q22!=="object") delete answers.q22;
 }catch(e){}
 render(); setSave(Object.keys(answers).length?"Saved in this browser":"");
 if(status==="submitted"){$("doneNote").textContent="You've already submitted this survey from this browser.";showDone();}
